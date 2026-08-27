@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit Your Website</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{
+    --bg: #F6F7FB;
+    --panel: #FFFFFF;
+    --border: #E1E4EC;
+    --ink: #1E2233;
+    --ink-soft: #6B7086;
+    --accent: #6C5CE7;
+    --accent-ink: #FFFFFF;
+    --ok: #1E9E6B;
+    --ok-bg: #E7F8F0;
+    --warn: #B4571A;
+    --warn-bg: #FDEEE2;
+    --danger: #D64545;
+    --radius: 12px;
+    --shadow: 0 8px 30px -12px rgba(30, 34, 51, 0.18);
+  }
+  *,*::before,*::after{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding-bottom: 6rem;
+  }
+  h1,h2,h3{ margin: 0 0 0.4rem; }
+  p{ margin: 0; }
+  a{ color: var(--accent); }
+
+  header{
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(246, 247, 251, 0.9);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  header h1{ font-size: 1.15rem; }
+  header p{ font-size: 0.85rem; color: var(--ink-soft); }
+
+  .wrap{ max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  button{
+    font: inherit; cursor: pointer;
+    border: 1px solid var(--border);
+    background: #fff; color: var(--ink);
+    border-radius: 999px;
+    padding: 0.6rem 1.1rem;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  button:hover{ transform: translateY(-1px); }
+  button.primary{ background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.primary:hover{ box-shadow: 0 6px 18px -6px rgba(108, 92, 231, 0.55); }
+  button.ghost{ background: transparent; }
+  button.danger-ghost{ background: transparent; color: var(--danger); border-color: #F3D2D2; }
+  button:disabled{ opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .status{
+    display: none;
+    align-items: center; gap: 0.5rem;
+    padding: 0.6rem 0.9rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  .status.show{ display: inline-flex; }
+  .status.ok{ background: var(--ok-bg); color: var(--ok); }
+  .status.warn{ background: var(--warn-bg); color: var(--warn); }
+
+  #gate-screen{ max-width: 520px; margin: 4rem auto; padding: 0 1.5rem; text-align: center; }
+  #gate-screen .card{ margin-top: 2rem; }
+  #gate-screen h1{ font-size: 1.5rem; }
+  #gate-screen p{ color: var(--ink-soft); margin-top: 0.5rem; }
+  #unsupported-note{
+    margin-top: 1.25rem; text-align: left;
+    background: var(--warn-bg); color: var(--warn);
+    border-radius: var(--radius); padding: 1rem 1.1rem; font-size: 0.85rem;
+    display: none;
+  }
+
+  #editor{ display: none; }
+
+  .section-title{ font-size: 1.05rem; }
+  .section-hint{ font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.2rem; margin-bottom: 1.1rem; }
+
+  label{ display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 0.3rem; }
+  .field{ margin-bottom: 1.1rem; }
+  .field:last-child{ margin-bottom: 0; }
+  .field-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 560px){ .field-row{ grid-template-columns: 1fr; } }
+
+  input[type="text"], input[type="email"], textarea, select{
+    width: 100%;
+    font: inherit; font-size: 0.95rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: #FCFCFE; color: var(--ink);
+  }
+  input:focus-visible, textarea:focus-visible, select:focus-visible{ outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea{ resize: vertical; min-height: 4.5rem; font-family: inherit; }
+  .textarea-hint{ font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.3rem; }
+
+  .file-field{
+    display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+    border: 1px dashed var(--border); border-radius: 10px; padding: 0.75rem;
+  }
+  .file-field .thumb{
+    width: 56px; height: 56px; border-radius: 8px; background: #EEF0F6;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    flex: 0 0 auto; color: var(--ink-soft); font-size: 0.7rem; text-align: center;
+  }
+  .file-field .thumb img{ width: 100%; height: 100%; object-fit: cover; }
+  .file-field .file-info{ flex: 1 1 160px; font-size: 0.82rem; color: var(--ink-soft); }
+  .file-field .file-info strong{ display: block; color: var(--ink); font-size: 0.88rem; }
+  .file-field input[type="file"]{ font-size: 0.82rem; }
+
+  .hero-photo-row{
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+  }
+  .hero-photo-row:last-child{ border-bottom: none; }
+  .hero-photo-row .thumb{
+    width: 44px; height: 44px; border-radius: 6px; background: #EEF0F6;
+    overflow: hidden; flex: 0 0 auto;
+  }
+  .hero-photo-row .thumb img{ width: 100%; height: 100%; object-fit: cover; }
+  .hero-photo-row .hero-photo-name{ flex: 1 1 auto; font-size: 0.85rem; color: var(--ink); word-break: break-all; }
+  .hero-photo-row button{
+    flex: 0 0 auto; background: transparent; color: var(--danger);
+    border: 1px solid #F3D2D2; border-radius: 999px; font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .story-card-editor{
+    border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem;
+    margin-bottom: 1rem; background: #FCFCFE;
+  }
+  .story-card-editor-head{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
+  .story-card-editor-actions{ display: flex; align-items: center; gap: 0.4rem; }
+  .move-up-btn, .move-down-btn{
+    width: 30px; height: 30px; padding: 0; line-height: 1;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: transparent; color: var(--ink-soft);
+  }
+  .move-up-btn:disabled, .move-down-btn:disabled{ opacity: 0.3; }
+  .story-card-editor-head h3{ font-size: 0.9rem; color: var(--ink-soft); }
+
+  .add-row{ margin-top: 0.25rem; }
+
+  .trivia-option-row{
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+  .trivia-option-row .trivia-option-letter{
+    flex: 0 0 auto; width: 22px; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft);
+  }
+  .trivia-option-row input{ flex: 1 1 auto; }
+  .trivia-option-row button{
+    flex: 0 0 auto; background: transparent; color: var(--danger);
+    border: 1px solid #F3D2D2; border-radius: 999px; font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  footer.save-bar{
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 0.9rem 1.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="gate-screen">
+  <h1>Edit Your Website</h1>
+  <p>Change the text and add photos on your "for her" site — this saves straight back into <code>for-her.html</code>, no code needed.</p>
+  <div class="card">
+    <button type="button" class="primary" id="pick-folder-btn">Open your website folder</button>
+    <p style="margin-top:0.9rem; font-size:0.82rem;">Pick the <strong>COBA WEBSITE</strong> folder (the one with <code>for-her.html</code> inside). Your browser will ask you to confirm — that's normal, it's how it gets permission to save your changes.</p>
+    <div id="reconnect-row" style="display:none; margin-top:1rem;">
+      <button type="button" class="ghost" id="reconnect-btn">Continue with <span id="reconnect-name"></span></button>
+    </div>
+  </div>
+  <div id="unsupported-note"></div>
+  <p id="gate-error" style="margin-top:1rem; color:#D64545; font-size:0.85rem;"></p>
+</div>
+
+<div id="editor">
+  <header>
+    <div>
+      <h1>Edit Your Website</h1>
+      <p id="folder-label"></p>
+    </div>
+    <div id="header-status" class="status"></div>
+  </header>
+
+  <div class="wrap">
+
+    <div class="card">
+      <h2 class="section-title">Names</h2>
+      <p class="section-hint">Used throughout the site.</p>
+      <div class="field-row">
+        <div class="field"><label for="f-herName">Her name</label><input type="text" id="f-herName"></div>
+        <div class="field"><label for="f-yourName">Your name</label><input type="text" id="f-yourName"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Intro (the "turn on the lights" screen)</h2>
+      <p class="section-hint">The very first thing she sees — a dark screen she has to open herself. After she taps "turn on the lights," a hidden line of text appears that she can only read by moving her cursor (or finger) over it like a flashlight. Once she's found it, a final line and a button appear so she can continue.</p>
+      <div class="field"><label for="f-introMessage">Opening line (before she taps the button)</label><input type="text" id="f-introMessage"></div>
+      <div class="field"><label for="f-introRevealText">Hidden line (found with the spotlight)</label><input type="text" id="f-introRevealText"></div>
+      <div class="field"><label for="f-introReadyText">Final line (appears with the continue button)</label><input type="text" id="f-introReadyText"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Hero (the opening page)</h2>
+      <p class="section-hint">A photo slideshow crossfades in the background as she scrolls this page.</p>
+      <div class="field"><label for="f-heroEyebrow">Small line above the title</label><input type="text" id="f-heroEyebrow"></div>
+      <div class="field"><label for="f-heroSub">Subtitle</label><textarea id="f-heroSub"></textarea></div>
+      <div class="field">
+        <label>Hero slideshow photos</label>
+        <div id="hero-photos-list"></div>
+        <div class="file-field">
+          <div class="thumb" id="thumb-heroPhotos">+</div>
+          <div class="file-info"><strong>Add photos</strong>they crossfade in the order shown above as she scrolls</div>
+          <input type="file" accept="image/*" multiple id="hero-photos-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">The Gate</h2>
+      <p class="section-hint">She has to answer this correctly right after the hero to unlock the rest of the site — she picks it from a date + month dropdown, not free text.</p>
+      <div class="field"><label for="f-gateQuestion">Question / hint</label><textarea id="f-gateQuestion"></textarea></div>
+      <div class="field"><label for="f-gateAnswer">Answer (format: "29 April")</label><input type="text" id="f-gateAnswer"></div>
+      <div class="field"><label for="f-gateHint">Clue shown if she answers wrong</label><input type="text" id="f-gateHint"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Our Story</h2>
+      <p class="section-hint">A short intro line, then your memory cards. Each has a photo, a date, a title, and a couple of sentences.</p>
+      <div class="field"><label for="f-storyIntro">Intro line</label><input type="text" id="f-storyIntro"></div>
+      <div id="story-cards-editor"></div>
+      <button type="button" class="ghost add-row" id="add-story-card-btn">+ Add another memory</button>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">What I Never Told You</h2>
+      <p class="section-hint">The honest-feelings section.</p>
+      <div class="field"><label for="f-feelingsQuote">The one-line quote at the top</label><textarea id="f-feelingsQuote"></textarea></div>
+      <div class="field">
+        <label for="f-feelingsParagraphs">Paragraphs</label>
+        <textarea id="f-feelingsParagraphs" style="min-height:8rem;"></textarea>
+        <p class="textarea-hint">One paragraph per line.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Trivia Questions</h2>
+      <p class="section-hint">One or more multiple-choice questions guarding "What I Never Told You" — she answers them one at a time, in order. Two wrong tries in a row on any of them sends her back to the very start. Add as many questions and options as you like.</p>
+      <div id="trivia-questions-editor"></div>
+      <button type="button" class="ghost add-row" id="add-trivia-question-btn">+ Add another question</button>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Music</h2>
+      <p class="section-hint">Background tracks — all optional, leave any blank to keep whatever's already set. Each one crossfades in at its moment.</p>
+      <div class="field">
+        <label>Plays from the start</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-bgMusicSrc">audio</div>
+          <div class="file-info"><strong id="name-bgMusicSrc">No track yet</strong>starts the moment she turns on the lights</div>
+          <input type="file" accept="audio/mpeg,audio/mp4,.mp3,.m4a" data-media="bgMusicSrc">
+        </div>
+      </div>
+      <div class="field">
+        <label>Plays once she opens the letter</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-letterMusicSrc">audio</div>
+          <div class="file-info"><strong id="name-letterMusicSrc">No track yet</strong>crossfades in when she answers the letter's question</div>
+          <input type="file" accept="audio/mpeg,audio/mp4,.mp3,.m4a" data-media="letterMusicSrc">
+        </div>
+      </div>
+      <div class="field">
+        <label>Plays once the voice note appears</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-voiceMusicSrc">audio</div>
+          <div class="file-info"><strong id="name-voiceMusicSrc">No track yet</strong>crossfades in right after she burns the letter</div>
+          <input type="file" accept="audio/mpeg,audio/mp4,.mp3,.m4a" data-media="voiceMusicSrc">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">The Letter — gate</h2>
+      <p class="section-hint">A second, separate question guarding just the letter.</p>
+      <div class="field"><label for="f-letterGateQuestion">Question / hint</label><textarea id="f-letterGateQuestion"></textarea></div>
+      <div class="field"><label for="f-letterGateAnswer">Answer</label><input type="text" id="f-letterGateAnswer"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">The Letter</h2>
+      <div class="field"><label for="f-letterDate">Date shown on the letter</label><input type="text" id="f-letterDate"></div>
+      <div class="field">
+        <label for="f-letterParagraphs">Letter text (after "Dear [her name],")</label>
+        <textarea id="f-letterParagraphs" style="min-height:8rem;"></textarea>
+        <p class="textarea-hint">One paragraph per line.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Voice Note</h2>
+      <div class="field">
+        <label>Voice recording</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-audioSrc">audio</div>
+          <div class="file-info"><strong id="name-audioSrc">No recording yet</strong>plays in the closing section</div>
+          <input type="file" accept="audio/mpeg,audio/mp4,.mp3,.m4a" data-media="audioSrc">
+        </div>
+      </div>
+      <div class="field"><label for="f-voicePhrase">Phrase she has to say out loud afterward</label><input type="text" id="f-voicePhrase"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Final Invitation</h2>
+      <div class="field"><label for="f-finalQuestion">The question</label><input type="text" id="f-finalQuestion"></div>
+      <div class="field"><label for="f-finalSub">Supporting line</label><textarea id="f-finalSub"></textarea></div>
+      <div class="field-row">
+        <div class="field"><label for="f-tripDate">Proposed date</label><input type="text" id="f-tripDate"></div>
+        <div class="field"><label for="f-destination">Somewhere like</label><input type="text" id="f-destination"></div>
+      </div>
+      <div class="field"><label for="f-whatsappMessage">Message sent when she taps "Yes" (opens WhatsApp)</label><textarea id="f-whatsappMessage"></textarea></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Floating background photos</h2>
+      <p class="section-hint">Small drifting photos scattered through the page — optional, leave any blank to keep the placeholder icon. Each can also have a small caption underneath, or leave that blank too.</p>
+      <div class="field">
+        <label>Hero</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto0">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto0">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="0">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="0" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>Our Story — photo 1</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto1">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto1">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="1">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="1" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>Our Story — photo 2</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto2">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto2">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="2">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="2" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>Our Story — photo 3</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto3">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto3">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="3">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="3" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>Our Story — photo 4</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto4">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto4">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="4">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="4" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>What I Never Told You — photo 1</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto5">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto5">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="5">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="5" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>What I Never Told You — photo 2</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto6">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto6">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="6">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="6" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>What I Never Told You — photo 3</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto7">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto7">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="7">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="7" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>The Letter — photo 1</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto8">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto8">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="8">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="8" placeholder="Caption (optional)">
+      </div>
+      <div class="field">
+        <label>The Letter — photo 2</label>
+        <div class="file-field">
+          <div class="thumb" id="thumb-floatPhoto9">photo</div>
+          <div class="file-info"><strong id="name-floatPhoto9">No photo yet</strong></div>
+          <input type="file" accept="image/*" data-float-photo="9">
+        </div>
+        <input type="text" class="float-caption-input" data-float-caption="9" placeholder="Caption (optional)">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="save-bar" id="save-bar" style="display:none;">
+  <button type="button" class="primary" id="save-btn">Save changes</button>
+  <span class="status" id="save-status"></span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var SUPPORTS_FS_ACCESS = "showDirectoryPicker" in window;
+  var dirHandle = null;
+  var fileHandle = null;
+  var currentHtml = "";
+  var storyCards = [];
+  var triviaList = [];
+  /* each item: { type: "existing", path } or { type: "new", file, tempUrl } */
+  var heroPhotos = [];
+  /* current saved paths for the 10 fixed floating-photo slots (index-matched
+     to document.querySelectorAll(".float-photo-inner") in for-her.html) */
+  var floatPhotoPaths = [];
+  var FLOAT_PHOTO_COUNT = 10;
+  /* pending uploads keyed by field name ("audioSrc"), "story:<index>" for a
+     story card photo, or "float:<index>" for a floating-photo slot — File
+     objects, written to disk only on Save (so picking a file doesn't touch
+     anything until then) */
+  var pendingUploads = {};
+
+  var gateScreen = document.getElementById("gate-screen");
+  var editor = document.getElementById("editor");
+  var gateError = document.getElementById("gate-error");
+  var unsupportedNote = document.getElementById("unsupported-note");
+
+  if (!SUPPORTS_FS_ACCESS){
+    unsupportedNote.style.display = "block";
+    unsupportedNote.innerHTML =
+      "Your browser doesn't support saving files directly (that needs Chrome or Edge). " +
+      "You can still open Chrome or Edge to use this editor, or edit for-her.html by hand — " +
+      "look for the <code>SITE DATA</code> block near the top of the file.";
+    document.getElementById("pick-folder-btn").disabled = true;
+  }
+
+  /* ---------- remembering the folder between visits (IndexedDB) ---------- */
+  function idbOpen(){
+    return new Promise(function(resolve){
+      var req = indexedDB.open("admin-store", 1);
+      req.onupgradeneeded = function(){ req.result.createObjectStore("handles"); };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ resolve(null); };
+    });
+  }
+  function idbGet(key){
+    return idbOpen().then(function(db){
+      return new Promise(function(resolve){
+        if (!db) return resolve(null);
+        var tx = db.transaction("handles", "readonly");
+        var r = tx.objectStore("handles").get(key);
+        r.onsuccess = function(){ resolve(r.result || null); };
+        r.onerror = function(){ resolve(null); };
+      });
+    });
+  }
+  function idbSet(key, val){
+    return idbOpen().then(function(db){
+      return new Promise(function(resolve){
+        if (!db) return resolve();
+        var tx = db.transaction("handles", "readwrite");
+        tx.objectStore("handles").put(val, key);
+        tx.oncomplete = function(){ resolve(); };
+        tx.onerror = function(){ resolve(); };
+      });
+    });
+  }
+
+  if (SUPPORTS_FS_ACCESS){
+    idbGet("projectDir").then(function(handle){
+      if (!handle) return;
+      document.getElementById("reconnect-name").textContent = "“" + handle.name + "”";
+      document.getElementById("reconnect-row").style.display = "block";
+      document.getElementById("reconnect-btn").addEventListener("click", function(){
+        openWithHandle(handle);
+      });
+    });
+  }
+
+  document.getElementById("pick-folder-btn").addEventListener("click", function(){
+    if (!SUPPORTS_FS_ACCESS) return;
+    window.showDirectoryPicker({ mode: "readwrite" }).then(function(handle){
+      idbSet("projectDir", handle);
+      openWithHandle(handle);
+    }).catch(function(err){
+      if (err && err.name !== "AbortError") gateError.textContent = "Couldn't open that folder: " + err.message;
+    });
+  });
+
+  function openWithHandle(handle){
+    gateError.textContent = "";
+    return handle.requestPermission({ mode: "readwrite" }).then(function(perm){
+      if (perm !== "granted"){
+        gateError.textContent = "Permission wasn't granted for that folder — try again.";
+        return;
+      }
+      dirHandle = handle;
+      return dirHandle.getFileHandle("for-her.html").then(function(fh){
+        fileHandle = fh;
+        return fh.getFile();
+      }).then(function(file){
+        return file.text();
+      }).then(function(text){
+        currentHtml = text;
+        var data = extractSiteData(text);
+        populateForm(data);
+        document.getElementById("folder-label").textContent = "Editing “" + dirHandle.name + "/for-her.html”";
+        gateScreen.style.display = "none";
+        editor.style.display = "block";
+        document.getElementById("save-bar").style.display = "flex";
+      });
+    }).catch(function(err){
+      gateError.textContent = "Couldn't find for-her.html in that folder — make sure you picked the right one (the folder containing for-her.html). (" + err.message + ")";
+    });
+  }
+
+  function extractSiteData(html){
+    var m = html.match(/<script type="application\/json" id="site-data">([\s\S]*?)<\/script>/);
+    if (!m) throw new Error("Couldn't find the site data block in for-her.html");
+    return JSON.parse(m[1]);
+  }
+
+  /* ---------- form population ---------- */
+  var TEXT_FIELDS = [
+    "herName","yourName","introMessage","introRevealText","introReadyText",
+    "heroEyebrow","heroSub","gateQuestion","gateAnswer","gateHint",
+    "storyIntro","feelingsQuote","letterGateQuestion","letterGateAnswer",
+    "letterDate","voicePhrase","finalQuestion","finalSub","tripDate","destination","whatsappMessage"
+  ];
+
+  function populateForm(data){
+    TEXT_FIELDS.forEach(function(key){
+      var el = document.getElementById("f-" + key);
+      if (el) el.value = data[key] || "";
+    });
+    document.getElementById("f-feelingsParagraphs").value = (data.feelingsParagraphs || []).join("\n");
+    document.getElementById("f-letterParagraphs").value = (data.letterParagraphs || []).join("\n");
+
+    triviaList = (data.trivia && data.trivia.length) ? data.trivia.map(function(q){
+      return {
+        question: q.question || "",
+        options: (q.options && q.options.length) ? q.options.slice() : ["", "", ""],
+        correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0
+      };
+    }) : [{ question: "", options: ["", "", ""], correctIndex: 0 }];
+    renderTriviaQuestionsEditor();
+
+    setMediaLabel("audioSrc", data.audioSrc);
+    setMediaLabel("bgMusicSrc", data.bgMusicSrc);
+    setMediaLabel("letterMusicSrc", data.letterMusicSrc);
+    setMediaLabel("voiceMusicSrc", data.voiceMusicSrc);
+
+    heroPhotos = (data.heroPhotos || []).map(function(path){ return { type: "existing", path: path }; });
+    renderHeroPhotos();
+
+    floatPhotoPaths = (data.floatPhotos || []).slice();
+    var floatCaptions = data.floatCaptions || [];
+    for (var fi = 0; fi < FLOAT_PHOTO_COUNT; fi++){
+      var nameEl = document.getElementById("name-floatPhoto" + fi);
+      if (nameEl) nameEl.textContent = floatPhotoPaths[fi] ? floatPhotoPaths[fi].split("/").pop() : "No photo yet";
+      var captionEl = document.querySelector('.float-caption-input[data-float-caption="' + fi + '"]');
+      if (captionEl) captionEl.value = floatCaptions[fi] || "";
+    }
+
+    storyCards = (data.storyCards || []).map(function(c){ return Object.assign({}, c); });
+    renderStoryCardEditors();
+  }
+
+  function setMediaLabel(field, path){
+    var nameEl = document.getElementById("name-" + field);
+    if (path){ nameEl.textContent = path.split("/").pop(); }
+    else { nameEl.textContent = "No recording yet"; }
+  }
+
+  function renderHeroPhotos(){
+    var list = document.getElementById("hero-photos-list");
+    list.innerHTML = "";
+    heroPhotos.forEach(function(item, i){
+      var row = document.createElement("div");
+      row.className = "hero-photo-row";
+      var thumbSrc = item.type === "existing" ? item.path : item.tempUrl;
+      var label = item.type === "existing" ? item.path.split("/").pop() : item.file.name + " (will save on Save)";
+      row.innerHTML =
+        '<div class="thumb"><img src="' + thumbSrc + '" alt=""></div>' +
+        '<div class="hero-photo-name"></div>' +
+        '<button type="button">Remove</button>';
+      row.querySelector(".hero-photo-name").textContent = label;
+      row.querySelector("button").addEventListener("click", function(){
+        heroPhotos.splice(i, 1);
+        renderHeroPhotos();
+      });
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("hero-photos-input").addEventListener("change", function(){
+    Array.from(this.files).forEach(function(file){
+      heroPhotos.push({ type: "new", file: file, tempUrl: URL.createObjectURL(file) });
+    });
+    this.value = "";
+    renderHeroPhotos();
+  });
+
+  /* swaps two cards' positions (and any pending, not-yet-saved photo
+     upload queued for either of them) — used by the move up/down buttons
+     so she can reorder memories, or add one at the end and walk it into
+     place, without ever deleting a card (which is what was silently
+     losing photos before: a removed card's photo is gone for good, and a
+     freshly re-added one always starts empty) */
+  function swapStoryCards(i, j){
+    var tmp = storyCards[i];
+    storyCards[i] = storyCards[j];
+    storyCards[j] = tmp;
+    var a = pendingUploads["story:" + i];
+    var b = pendingUploads["story:" + j];
+    if (b !== undefined) pendingUploads["story:" + i] = b; else delete pendingUploads["story:" + i];
+    if (a !== undefined) pendingUploads["story:" + j] = a; else delete pendingUploads["story:" + j];
+    renderStoryCardEditors();
+  }
+
+  function renderStoryCardEditors(){
+    var container = document.getElementById("story-cards-editor");
+    container.innerHTML = "";
+    storyCards.forEach(function(card, i){
+      var box = document.createElement("div");
+      box.className = "story-card-editor";
+      box.innerHTML =
+        '<div class="story-card-editor-head"><h3>Memory ' + (i + 1) + '</h3>' +
+        '<div class="story-card-editor-actions">' +
+          '<button type="button" class="ghost move-up-btn"' + (i === 0 ? " disabled" : "") + ' aria-label="Move up">↑</button>' +
+          '<button type="button" class="ghost move-down-btn"' + (i === storyCards.length - 1 ? " disabled" : "") + ' aria-label="Move down">↓</button>' +
+          (storyCards.length > 1 ? '<button type="button" class="danger-ghost remove-card-btn">Remove</button>' : '') +
+        '</div>' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<div class="field"><label>Date</label><input type="text" class="sc-date"></div>' +
+          '<div class="field"><label>Photo caption (small text under the photo)</label><input type="text" class="sc-caption"></div>' +
+        '</div>' +
+        '<div class="field"><label>Title</label><input type="text" class="sc-title"></div>' +
+        '<div class="field"><label>Short story (1–3 sentences)</label><textarea class="sc-text"></textarea></div>' +
+        '<div class="field">' +
+          '<label>Photo</label>' +
+          '<div class="file-field">' +
+            '<div class="thumb sc-thumb">photo</div>' +
+            '<div class="file-info"><strong class="sc-photo-name">No photo yet</strong>tap-to-reveal in Our Story</div>' +
+            '<input type="file" accept="image/*" class="sc-photo-input">' +
+          '</div>' +
+        '</div>';
+
+      box.querySelector(".sc-date").value = card.date || "";
+      box.querySelector(".sc-caption").value = card.caption || "";
+      box.querySelector(".sc-title").value = card.title || "";
+      box.querySelector(".sc-text").value = card.text || "";
+      if (card.photo){ box.querySelector(".sc-photo-name").textContent = card.photo.split("/").pop(); }
+      var thumb = box.querySelector(".sc-thumb");
+      var pendingKey = "story:" + i;
+      if (pendingUploads[pendingKey]) renderThumb(thumb, pendingUploads[pendingKey]);
+
+      box.querySelector(".sc-date").addEventListener("input", function(e){ storyCards[i].date = e.target.value; });
+      box.querySelector(".sc-caption").addEventListener("input", function(e){ storyCards[i].caption = e.target.value; });
+      box.querySelector(".sc-title").addEventListener("input", function(e){ storyCards[i].title = e.target.value; });
+      box.querySelector(".sc-text").addEventListener("input", function(e){ storyCards[i].text = e.target.value; });
+      box.querySelector(".sc-photo-input").addEventListener("change", function(e){
+        var file = e.target.files[0];
+        if (!file) return;
+        pendingUploads["story:" + i] = file;
+        box.querySelector(".sc-photo-name").textContent = file.name + " (will save on Save)";
+        renderThumb(thumb, file);
+      });
+      var moveUpBtn = box.querySelector(".move-up-btn");
+      if (moveUpBtn && !moveUpBtn.disabled) moveUpBtn.addEventListener("click", function(){ swapStoryCards(i, i - 1); });
+      var moveDownBtn = box.querySelector(".move-down-btn");
+      if (moveDownBtn && !moveDownBtn.disabled) moveDownBtn.addEventListener("click", function(){ swapStoryCards(i, i + 1); });
+
+      var removeBtn = box.querySelector(".remove-card-btn");
+      if (removeBtn){
+        removeBtn.addEventListener("click", function(){
+          storyCards.splice(i, 1);
+          /* pendingUploads is keyed by array position — removing a card
+             shifts every later card down by one, so any pending photo
+             upload queued for a later index needs to shift down with it
+             (otherwise it'd get written to whatever card now sits at that
+             position on the next Save, not the card it was actually
+             picked for) */
+          var shifted = {};
+          Object.keys(pendingUploads).forEach(function(key){
+            if (key.indexOf("story:") !== 0) { shifted[key] = pendingUploads[key]; return; }
+            var n = parseInt(key.split(":")[1], 10);
+            if (n === i) return;
+            shifted["story:" + (n > i ? n - 1 : n)] = pendingUploads[key];
+          });
+          pendingUploads = shifted;
+          renderStoryCardEditors();
+        });
+      }
+
+      container.appendChild(box);
+    });
+  }
+
+  document.getElementById("add-story-card-btn").addEventListener("click", function(){
+    storyCards.push({ date: "", title: "", text: "", caption: "", photo: "" });
+    renderStoryCardEditors();
+  });
+
+  /* renders every trivia question as its own box (mirroring the story-card
+     editor pattern), each with its own option-row list and correct-answer
+     <select> — options are scoped per question since each question has its
+     own independent set of answers */
+  function renderTriviaQuestionsEditor(){
+    var container = document.getElementById("trivia-questions-editor");
+    container.innerHTML = "";
+    triviaList.forEach(function(q, qi){
+      var box = document.createElement("div");
+      box.className = "story-card-editor";
+      box.innerHTML =
+        '<div class="story-card-editor-head"><h3>Question ' + (qi + 1) + '</h3>' +
+        '<div class="story-card-editor-actions">' +
+          '<button type="button" class="ghost move-up-btn"' + (qi === 0 ? " disabled" : "") + ' aria-label="Move up">↑</button>' +
+          '<button type="button" class="ghost move-down-btn"' + (qi === triviaList.length - 1 ? " disabled" : "") + ' aria-label="Move down">↓</button>' +
+          (triviaList.length > 1 ? '<button type="button" class="danger-ghost remove-question-btn">Remove</button>' : '') +
+        '</div>' +
+        '</div>' +
+        '<div class="field"><label>Question</label><textarea class="tq-question"></textarea></div>' +
+        '<div class="field">' +
+          '<label>Options</label>' +
+          '<div class="tq-options-editor"></div>' +
+          '<button type="button" class="ghost add-row tq-add-option-btn">+ Add another option</button>' +
+        '</div>' +
+        '<div class="field"><label>Correct answer</label><select class="tq-correct-index"></select></div>';
+
+      box.querySelector(".tq-question").value = q.question || "";
+      box.querySelector(".tq-question").addEventListener("input", function(e){ triviaList[qi].question = e.target.value; });
+
+      renderTriviaOptionsEditor(box, qi);
+
+      box.querySelector(".tq-add-option-btn").addEventListener("click", function(){
+        triviaList[qi].options.push("");
+        renderTriviaOptionsEditor(box, qi);
+      });
+
+      var moveUpBtn = box.querySelector(".move-up-btn");
+      if (moveUpBtn && !moveUpBtn.disabled) moveUpBtn.addEventListener("click", function(){
+        var tmp = triviaList[qi]; triviaList[qi] = triviaList[qi - 1]; triviaList[qi - 1] = tmp;
+        renderTriviaQuestionsEditor();
+      });
+      var moveDownBtn = box.querySelector(".move-down-btn");
+      if (moveDownBtn && !moveDownBtn.disabled) moveDownBtn.addEventListener("click", function(){
+        var tmp = triviaList[qi]; triviaList[qi] = triviaList[qi + 1]; triviaList[qi + 1] = tmp;
+        renderTriviaQuestionsEditor();
+      });
+      var removeBtn = box.querySelector(".remove-question-btn");
+      if (removeBtn) removeBtn.addEventListener("click", function(){
+        triviaList.splice(qi, 1);
+        renderTriviaQuestionsEditor();
+      });
+
+      container.appendChild(box);
+    });
+  }
+
+  /* renders the option rows AND correct-answer <select> for ONE question
+     box (qi indexes into triviaList) — keepSelected lets a caller preserve
+     which option was marked correct, clamped if that option got removed */
+  function renderTriviaOptionsEditor(box, qi, keepSelected){
+    var q = triviaList[qi];
+    var list = box.querySelector(".tq-options-editor");
+    var selectEl = box.querySelector(".tq-correct-index");
+    var previousSelected = keepSelected !== undefined ? keepSelected : (parseInt(selectEl.value, 10) || 0);
+
+    list.innerHTML = "";
+    q.options.forEach(function(opt, i){
+      var letter = String.fromCharCode(65 + i);
+      var row = document.createElement("div");
+      row.className = "trivia-option-row";
+      row.innerHTML =
+        '<span class="trivia-option-letter">' + letter + '.</span>' +
+        '<input type="text" placeholder="Option ' + letter + '">' +
+        (q.options.length > 2 ? '<button type="button">Remove</button>' : '');
+      row.querySelector("input").value = opt || "";
+      row.querySelector("input").addEventListener("input", function(e){
+        triviaList[qi].options[i] = e.target.value;
+      });
+      var removeBtn = row.querySelector("button");
+      if (removeBtn){
+        removeBtn.addEventListener("click", function(){
+          triviaList[qi].options.splice(i, 1);
+          renderTriviaOptionsEditor(box, qi, previousSelected === i ? 0 : (previousSelected > i ? previousSelected - 1 : previousSelected));
+        });
+      }
+      list.appendChild(row);
+    });
+
+    selectEl.innerHTML = "";
+    q.options.forEach(function(opt, i){
+      var option = document.createElement("option");
+      option.value = String(i);
+      option.textContent = String.fromCharCode(65 + i);
+      selectEl.appendChild(option);
+    });
+    var clamped = Math.min(previousSelected, q.options.length - 1);
+    selectEl.value = String(clamped);
+    triviaList[qi].correctIndex = clamped;
+    /* assigned via onchange (not addEventListener) since this function
+       re-runs on every option add/remove and reuses the same <select>
+       node — addEventListener would stack a fresh listener each time */
+    selectEl.onchange = function(e){
+      triviaList[qi].correctIndex = parseInt(e.target.value, 10) || 0;
+    };
+  }
+
+  document.getElementById("add-trivia-question-btn").addEventListener("click", function(){
+    triviaList.push({ question: "", options: ["", "", ""], correctIndex: 0 });
+    renderTriviaQuestionsEditor();
+  });
+
+  function renderThumb(thumbEl, file){
+    if (!file.type || file.type.indexOf("image") !== 0) return;
+    var url = URL.createObjectURL(file);
+    thumbEl.innerHTML = '<img src="' + url + '" alt="">';
+  }
+
+  /* media inputs for audioSrc (heroPhotos has its own handler above) */
+  document.querySelectorAll('input[type="file"][data-media]').forEach(function(input){
+    input.addEventListener("change", function(){
+      var file = input.files[0];
+      if (!file) return;
+      var field = input.getAttribute("data-media");
+      pendingUploads[field] = file;
+      document.getElementById("name-" + field).textContent = file.name + " (will save on Save)";
+      if (file.type.indexOf("image") === 0) renderThumb(document.getElementById("thumb-" + field), file);
+    });
+  });
+
+  /* the 6 fixed floating-photo slots */
+  document.querySelectorAll('input[type="file"][data-float-photo]').forEach(function(input){
+    input.addEventListener("change", function(){
+      var file = input.files[0];
+      if (!file) return;
+      var idx = input.getAttribute("data-float-photo");
+      pendingUploads["float:" + idx] = file;
+      document.getElementById("name-floatPhoto" + idx).textContent = file.name + " (will save on Save)";
+      renderThumb(document.getElementById("thumb-floatPhoto" + idx), file);
+    });
+  });
+
+  /* ---------- collecting form values back into a data object ---------- */
+  function collectFormData(){
+    var data = {};
+    TEXT_FIELDS.forEach(function(key){
+      var el = document.getElementById("f-" + key);
+      if (el) data[key] = el.value;
+    });
+    data.feelingsParagraphs = document.getElementById("f-feelingsParagraphs").value.split("\n").map(function(s){ return s.trim(); }).filter(Boolean);
+    data.letterParagraphs = document.getElementById("f-letterParagraphs").value.split("\n").map(function(s){ return s.trim(); }).filter(Boolean);
+    data.trivia = triviaList.map(function(q){
+      return { question: q.question, options: q.options.slice(), correctIndex: q.correctIndex };
+    });
+    var existingData = extractSiteData(currentHtml);
+    data.audioSrc = document.getElementById("name-audioSrc").dataset.path || (existingData.audioSrc || "");
+    data.bgMusicSrc = document.getElementById("name-bgMusicSrc").dataset.path || (existingData.bgMusicSrc || "");
+    data.letterMusicSrc = document.getElementById("name-letterMusicSrc").dataset.path || (existingData.letterMusicSrc || "");
+    data.voiceMusicSrc = document.getElementById("name-voiceMusicSrc").dataset.path || (existingData.voiceMusicSrc || "");
+    data.darkBgPhoto = existingData.darkBgPhoto || "";
+    data.heroPhotos = heroPhotos.map(function(item){ return item.type === "existing" ? item.path : ""; });
+    data.floatPhotos = floatPhotoPaths.slice(0, FLOAT_PHOTO_COUNT);
+    while (data.floatPhotos.length < FLOAT_PHOTO_COUNT) data.floatPhotos.push("");
+    data.floatCaptions = [];
+    for (var fci = 0; fci < FLOAT_PHOTO_COUNT; fci++){
+      var fcEl = document.querySelector('.float-caption-input[data-float-caption="' + fci + '"]');
+      data.floatCaptions.push(fcEl ? fcEl.value.trim() : "");
+    }
+    data.storyCards = storyCards.map(function(c){ return { date: c.date, title: c.title, text: c.text, caption: c.caption, photo: c.photo || "" }; });
+    return data;
+  }
+
+  function spliceSiteData(html, data){
+    var json = JSON.stringify(data, null, 2);
+    return html.replace(
+      /(<script type="application\/json" id="site-data">)([\s\S]*?)(<\/script>)/,
+      function(_, open, _old, close){ return open + "\n" + json + "\n" + close; }
+    );
+  }
+
+  /* ---------- writing files into subfolders ---------- */
+  function writeIntoSubfolder(subfolder, file, suggestedName){
+    return dirHandle.getDirectoryHandle(subfolder, { create: true }).then(function(subDir){
+      var name = suggestedName || file.name;
+      return subDir.getFileHandle(name, { create: true }).then(function(fh){
+        return fh.createWritable().then(function(writable){
+          return writable.write(file).then(function(){ return writable.close(); });
+        }).then(function(){ return subfolder + "/" + name; });
+      });
+    });
+  }
+
+  function setStatus(el, text, kind){
+    el.textContent = text;
+    el.className = "status show " + kind;
+  }
+
+  document.getElementById("save-btn").addEventListener("click", function(){
+    var btn = document.getElementById("save-btn");
+    var statusEl = document.getElementById("save-status");
+    btn.disabled = true;
+    setStatus(statusEl, "Saving…", "ok");
+
+    var data = collectFormData();
+
+    var uploadJobs = [];
+    Object.keys(pendingUploads).forEach(function(key){
+      var file = pendingUploads[key];
+      if (key === "audioSrc"){
+        uploadJobs.push(writeIntoSubfolder("audio", file, "voice-note" + extOf(file.name)).then(function(path){ data.audioSrc = path; }));
+      } else if (key === "bgMusicSrc"){
+        uploadJobs.push(writeIntoSubfolder("audio", file, "bg-music" + extOf(file.name)).then(function(path){ data.bgMusicSrc = path; }));
+      } else if (key === "letterMusicSrc"){
+        uploadJobs.push(writeIntoSubfolder("audio", file, "letter-music" + extOf(file.name)).then(function(path){ data.letterMusicSrc = path; }));
+      } else if (key === "voiceMusicSrc"){
+        uploadJobs.push(writeIntoSubfolder("audio", file, "voice-music" + extOf(file.name)).then(function(path){ data.voiceMusicSrc = path; }));
+      } else if (key.indexOf("story:") === 0){
+        var idx = parseInt(key.split(":")[1], 10);
+        uploadJobs.push(writeIntoSubfolder("images", file, "story-" + (idx + 1) + extOf(file.name)).then(function(path){
+          if (data.storyCards[idx]) data.storyCards[idx].photo = path;
+          /* also write back into the live storyCards array (not just the
+             disposable `data` copy above) — otherwise the next Save call
+             rebuilds `data.storyCards` from this same array via
+             collectFormData(), sees the old empty/stale photo, and silently
+             overwrites the path that was just uploaded here */
+          if (storyCards[idx]) storyCards[idx].photo = path;
+        }));
+      } else if (key.indexOf("float:") === 0){
+        var fIdx = parseInt(key.split(":")[1], 10);
+        uploadJobs.push(writeIntoSubfolder("images", file, "float-" + (fIdx + 1) + extOf(file.name)).then(function(path){
+          data.floatPhotos[fIdx] = path;
+          floatPhotoPaths[fIdx] = path;
+        }));
+      }
+    });
+    heroPhotos.forEach(function(item, i){
+      if (item.type !== "new") return;
+      uploadJobs.push(writeIntoSubfolder("images", item.file, "hero-" + (i + 1) + extOf(item.file.name)).then(function(path){
+        data.heroPhotos[i] = path;
+        item.type = "existing";
+        item.path = path;
+      }));
+    });
+
+    Promise.all(uploadJobs).then(function(){
+      return fileHandle.getFile();
+    }).then(function(file){
+      return file.text();
+    }).then(function(freshHtml){
+      var updated = spliceSiteData(freshHtml, data);
+      return fileHandle.createWritable().then(function(writable){
+        return writable.write(updated).then(function(){ return writable.close(); }).then(function(){ return updated; });
+      });
+    }).then(function(updated){
+      currentHtml = updated;
+      pendingUploads = {};
+      setStatus(statusEl, "Saved! Your website is up to date.", "ok");
+      setStatus(document.getElementById("header-status"), "Saved", "ok");
+      btn.disabled = false;
+      setTimeout(function(){ statusEl.classList.remove("show"); }, 4000);
+    }).catch(function(err){
+      setStatus(statusEl, "Couldn't save: " + err.message, "warn");
+      btn.disabled = false;
+    });
+  });
+
+  function extOf(name){
+    var m = /\.[^.]+$/.exec(name || "");
+    return m ? m[0].toLowerCase() : "";
+  }
+})();
+</script>
+
+</body>
+</html>
